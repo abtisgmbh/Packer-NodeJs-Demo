@@ -1,0 +1,36 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+
+- task: Npm@1
+  inputs:
+    command: 'install'
+    workingDir: 'NodejsWebApp1'
+
+- task: gulp@0
+  inputs:
+    gulpFile: 'NodejsWebApp1/gulpfile.js'
+    targets: 
+    gulpjs: 'node_modules/gulp/bin/gulp.js'
+    enableCodeCoverage: false
+
+- task: Npm@1
+  inputs:
+    command: 'custom'
+    workingDir: 'NodejsWebApp1'
+    customCommand: 'test'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: 'NodejsWebApp1'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
