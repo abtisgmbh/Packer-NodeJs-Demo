@@ -12,15 +12,18 @@ pool:
 steps:
 
 - task: NodeTool@0
+  displayName: "Install matching Node version"
   inputs:
     versionSpec: '10.x'
 
 - task: Npm@1
+  displayName: "Install software dependencies"
   inputs:
     command: 'install'
     workingDir: 'NodejsWebApp1'
 
 - task: gulp@0
+  displayName: "Invoke gulpfile.js"
   inputs:
     gulpFile: 'NodejsWebApp1/gulpfile.js'
     targets: 
@@ -28,12 +31,14 @@ steps:
     enableCodeCoverage: false
 
 - task: Npm@1
+  displayName: "Run automated tests"
   inputs:
     command: 'custom'
     workingDir: 'NodejsWebApp1'
     customCommand: 'test'
 
 - task: PublishBuildArtifacts@1
+  displayName: "Publish build artifact"
   inputs:
     PathtoPublish: 'NodejsWebApp1'
     ArtifactName: 'drop'
