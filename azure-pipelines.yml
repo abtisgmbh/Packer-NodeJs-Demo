@@ -41,13 +41,6 @@ steps:
     workingDir: 'NodejsWebApp1'
     customCommand: 'test'
 
-- task: PublishBuildArtifacts@1
-  displayName: "Publish build artifact"
-  inputs:
-    PathtoPublish: 'NodejsWebApp1'
-    ArtifactName: 'drop'
-    publishLocation: 'Container'
-
 - task: PackerBuild@1
   displayName: "Bake immutable image for VMSS"
   inputs:
@@ -60,7 +53,7 @@ steps:
     azureResourceGroup: 'rg-vmss-workshop'
     baseImageSource: 'default'
     baseImage: 'Canonical:UbuntuServer:18.04-LTS:linux'
-    packagePath: '$(System.DefaultWorkingDirectory)/Packer-NodeJs/drop'
+    packagePath: '$(System.DefaultWorkingDirectory)/NodejsWebApp1'
     deployScriptPath: 'Deploy/ubuntu/deployNodejsApp.sh'
     imageUri: 'bakedImageUrl'
 
