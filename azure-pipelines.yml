@@ -82,5 +82,5 @@ steps:
       --gallery-image-definition ${{ parameters.ImageDefinition }} \
       --gallery-image-version 1.0.0 \
       --target-regions "westeurope" \
-      --managed-image $(bakedImageId)
+      --managed-image "$(bakedImageId)"
     failOnStandardError: true
