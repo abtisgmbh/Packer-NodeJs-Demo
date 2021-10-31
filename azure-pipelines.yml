@@ -18,6 +18,13 @@ parameters:
 
   - name: ImageDefinition
     default: "nginx-vm"
+
+  - name: StorageAccount
+    default: "myImageStore"
+
+  - name: ManagedImageName
+    default: "nginx-vm-ManagedDiskImage"
+
 steps:
 
 - task: NodeTool@0
@@ -52,15 +59,16 @@ steps:
     templateType: 'builtin'
     ConnectedServiceName: 'devops-test'
     isManagedImage: true
-    managedImageName: 'customManagedImage'
+    managedImageName: '${{ parameters.ManagedImageName }}'
     location: 'westeurope'
-    storageAccountName: 'customimagestore321'
-    azureResourceGroup: 'rg-vmss-workshop'
+    storageAccountName: '${{ parameters.StorageAccount }}'
+    azureResourceGroup: '${{ parameters.ResourceGroup }}'
     baseImageSource: 'default'
     baseImage: 'Canonical:UbuntuServer:18.04-LTS:linux'
     packagePath: '$(System.DefaultWorkingDirectory)/NodejsWebApp1'
     deployScriptPath: 'Deploy/ubuntu/deployNodejsApp.sh'
     imageUri: 'bakedImageUrl'
+    imageId: 'bakedImageAzureId'
 
 - task: AzureCLI@2
   inputs:
@@ -74,5 +82,5 @@ steps:
       --gallery-image-definition ${{ parameters.ImageDefinition }} \
       --gallery-image-version 1.0.0 \
       --target-regions "westeurope" \
-      --managed-image $(bakedImageUrl)
+      --managed-image $(bakedImageId)
     failOnStandardError: true
