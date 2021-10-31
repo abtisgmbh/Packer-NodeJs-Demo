@@ -10,9 +10,14 @@ pool:
   vmImage: ubuntu-latest
 
 parameters:
-  - name: VMScaleSetName
-    default: "ngnixVmScaleSet"
+  - name: ResourceGroup
+    default: "rg-vmss-test"
 
+  - name: GalleryName
+    default: "gallery"
+
+  - name: ImageDefinition
+    default: "nginx-vm"
 steps:
 
 - task: NodeTool@0
@@ -57,11 +62,17 @@ steps:
     deployScriptPath: 'Deploy/ubuntu/deployNodejsApp.sh'
     imageUri: 'bakedImageUrl'
 
-- task: AzureVmssDeployment@0
-  displayName: "Update VMSS with freshly baked image"
+- task: AzureCLI@2
   inputs:
     azureSubscription: 'devops-test'
-    action: 'Update image'
-    vmssName: ${{ parameters.VMScaleSetName }}
-    vmssOsType: 'Linux'
-    imageUrl: '$(bakedImageUrl)'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      az sig image-version create \
+      --resource-group ${{ parameters.ResourceGroup }} \
+      --gallery-name ${{ parameters.GalleryName }}  \
+      --gallery-image-definition ${{ parameters.ImageDefinition }} \
+      --gallery-image-version 1.0.0 \
+      --target-regions "westeurope" \
+      --managed-image $(bakedImageUrl)
+    failOnStandardError: true
