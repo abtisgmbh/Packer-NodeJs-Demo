@@ -80,7 +80,7 @@ steps:
       --resource-group ${{ parameters.ResourceGroup }} \
       --gallery-name ${{ parameters.GalleryName }}  \
       --gallery-image-definition ${{ parameters.ImageDefinition }} \
-      --gallery-image-version 1.0.0 \
+      --gallery-image-version 1.0.1 \
       --target-regions "westeurope" \
-      --managed-image "$(bakedImageId)"
+      --managed-image "$(bakedImageAzureId)"
     failOnStandardError: true
