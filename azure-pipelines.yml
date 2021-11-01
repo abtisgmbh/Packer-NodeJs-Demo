@@ -22,9 +22,6 @@ parameters:
   - name: StorageAccount
     default: "myImageStore"
 
-  - name: ManagedImageName
-    default: "nginx-vm-ManagedDiskImage"
-
 steps:
 
 - task: NodeTool@0
@@ -58,8 +55,7 @@ steps:
   inputs:
     templateType: 'builtin'
     ConnectedServiceName: 'devops-test'
-    isManagedImage: true
-    managedImageName: '${{ parameters.ManagedImageName }}'
+    isManagedImage: false
     location: 'westeurope'
     storageAccountName: '${{ parameters.StorageAccount }}'
     azureResourceGroup: '${{ parameters.ResourceGroup }}'
