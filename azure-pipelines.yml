@@ -74,11 +74,20 @@ steps:
     scriptType: 'bash'
     scriptLocation: 'inlineScript'
     inlineScript: |
+
+      storageId=$(az storage account show \
+        --resource-group ${{ parameters.ResourceGroup }} \
+        --name ${{ parameters.StorageAccount }} \
+        --query id \
+        --output tsv)
+
       az sig image-version create \
-      --resource-group ${{ parameters.ResourceGroup }} \
-      --gallery-name ${{ parameters.GalleryName }}  \
-      --gallery-image-definition ${{ parameters.ImageDefinition }} \
-      --gallery-image-version ${{ parameters.ImageVersion }} \
-      --target-regions "westeurope" \
-      --os-vhd-uri "$(bakedImageUrl)"
+        --resource-group ${{ parameters.ResourceGroup }} \
+        --gallery-name ${{ parameters.GalleryName }}  \
+        --gallery-image-definition ${{ parameters.ImageDefinition }} \
+        --gallery-image-version ${{ parameters.ImageVersion }} \
+        --target-regions "westeurope" \
+        --os-vhd-uri "$(bakedImageUrl)" \
+        --os-vhd-storage-account $storageId
+
     failOnStandardError: true
