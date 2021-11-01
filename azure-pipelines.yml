@@ -80,5 +80,5 @@ steps:
       --gallery-image-definition ${{ parameters.ImageDefinition }} \
       --gallery-image-version ${{ parameters.ImageVersion }} \
       --target-regions "westeurope" \
-      --managed-image "$(bakedImageUrl)"
+      --os-vhd-uri "$(bakedImageUrl)"
     failOnStandardError: true
