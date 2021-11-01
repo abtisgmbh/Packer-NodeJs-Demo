@@ -67,7 +67,6 @@ steps:
     packagePath: '$(System.DefaultWorkingDirectory)/NodejsWebApp1'
     deployScriptPath: 'Deploy/ubuntu/deployNodejsApp.sh'
     imageUri: 'bakedImageUrl'
-    imageId: 'bakedImageAzureId'
 
 - task: AzureCLI@2
   inputs:
@@ -81,5 +80,5 @@ steps:
       --gallery-image-definition ${{ parameters.ImageDefinition }} \
       --gallery-image-version ${{ parameters.ImageVersion }} \
       --target-regions "westeurope" \
-      --managed-image "$(bakedImageAzureId)"
+      --managed-image "$(bakedImageUrl)"
     failOnStandardError: true
