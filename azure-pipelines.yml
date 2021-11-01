@@ -9,18 +9,37 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
+parameters:
+  - name: ResourceGroup
+    default: "rg-vmss-test"
+
+  - name: GalleryName
+    default: "gallery"
+
+  - name: ImageDefinition
+    default: "nginx-vm"
+
+  - name: StorageAccount
+    default: "myImageStore"
+
+  - name: ImageVersion
+    default: "1.0.1"
+
 steps:
 
 - task: NodeTool@0
+  displayName: "Install matching Node version"
   inputs:
     versionSpec: '10.x'
 
 - task: Npm@1
+  displayName: "Install software dependencies"
   inputs:
     command: 'install'
     workingDir: 'NodejsWebApp1'
 
 - task: gulp@0
+  displayName: "Invoke gulpfile.js"
   inputs:
     gulpFile: 'NodejsWebApp1/gulpfile.js'
     targets: 
@@ -28,13 +47,47 @@ steps:
     enableCodeCoverage: false
 
 - task: Npm@1
+  displayName: "Run automated tests"
   inputs:
     command: 'custom'
     workingDir: 'NodejsWebApp1'
     customCommand: 'test'
 
-- task: PublishBuildArtifacts@1
+- task: PackerBuild@1
+  displayName: "Bake immutable image for VMSS"
   inputs:
-    PathtoPublish: 'NodejsWebApp1'
-    ArtifactName: 'drop'
-    publishLocation: 'Container'
+    templateType: 'builtin'
+    ConnectedServiceName: 'devops-test'
+    isManagedImage: false
+    location: 'westeurope'
+    storageAccountName: '${{ parameters.StorageAccount }}'
+    azureResourceGroup: '${{ parameters.ResourceGroup }}'
+    baseImageSource: 'default'
+    baseImage: 'Canonical:UbuntuServer:18.04-LTS:linux'
+    packagePath: '$(System.DefaultWorkingDirectory)/NodejsWebApp1'
+    deployScriptPath: 'Deploy/ubuntu/deployNodejsApp.sh'
+    imageUri: 'bakedImageUrl'
+
+- task: AzureCLI@2
+  inputs:
+    azureSubscription: 'devops-test'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+
+      storageId=$(az storage account show \
+        --resource-group ${{ parameters.ResourceGroup }} \
+        --name ${{ parameters.StorageAccount }} \
+        --query id \
+        --output tsv)
+
+      az sig image-version create \
+        --resource-group ${{ parameters.ResourceGroup }} \
+        --gallery-name ${{ parameters.GalleryName }}  \
+        --gallery-image-definition ${{ parameters.ImageDefinition }} \
+        --gallery-image-version ${{ parameters.ImageVersion }} \
+        --target-regions "westeurope" \
+        --os-vhd-uri "$(bakedImageUrl)" \
+        --os-vhd-storage-account $storageId
+
+    failOnStandardError: true
