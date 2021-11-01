@@ -22,6 +22,9 @@ parameters:
   - name: StorageAccount
     default: "myImageStore"
 
+  - name: ImageVersion
+    default: "1.0.1"
+
 steps:
 
 - task: NodeTool@0
@@ -76,7 +79,7 @@ steps:
       --resource-group ${{ parameters.ResourceGroup }} \
       --gallery-name ${{ parameters.GalleryName }}  \
       --gallery-image-definition ${{ parameters.ImageDefinition }} \
-      --gallery-image-version 1.0.1 \
+      --gallery-image-version ${{ parameters.ImageVersion }} \
       --target-regions "westeurope" \
       --managed-image "$(bakedImageAzureId)"
     failOnStandardError: true
